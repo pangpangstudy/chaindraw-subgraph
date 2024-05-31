@@ -1,0 +1,6 @@
+{
+  "name": "Concert Ticket",
+  "description": "This is a ticket for the upcoming concert.",
+  "image": "ipfs://QmdRkCmHrZuA5XetmSfLgmVSe5ms2MS7HonC4LuXieRR4b",
+  "attributes": { "concert_name": "xx演唱会", "address": "中国" }
+}

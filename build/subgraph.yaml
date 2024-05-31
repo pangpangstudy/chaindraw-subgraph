@@ -1,0 +1,94 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+features:
+  - nonFatalErrors
+  - ipfsOnEthereumContracts
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Factory
+    network: chapel
+    source:
+      address: "0x7C9621B1B60A2dFb22Bd427cA429066015Ed0EFF"
+      abi: Factory
+      startBlock: 40805232
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - EscrowCreated
+      abis:
+        - name: Factory
+          file: Factory\abis\LotteryEscrowFactory.json
+        - name: LotteryEscrow
+          file: Factory\abis\LotteryEscrow.json
+      eventHandlers:
+        - event: EscrowCreated(string,indexed uint256,address)
+          handler: handleEscrowCreated
+      file: Factory\Factory.wasm
+  - kind: ethereum
+    name: Market
+    network: chapel
+    source:
+      address: "0xefA0E99A60512cDDa5bEA302b40438A76b8b78E2"
+      abi: Market
+      startBlock: 40724890
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - NFTDelisted
+        - NFTListed
+        - NFTSold
+      abis:
+        - name: Market
+          file: Market\abis\Market.json
+        - name: LotteryEscrow
+          file: Market\abis\LotteryEscrow.json
+      eventHandlers:
+        - event: NFTDelisted(indexed address,indexed address,indexed uint256)
+          handler: handleNFTDelist
+        - event: NFTListed(indexed address,indexed address,indexed uint256,uint256)
+          handler: handleNFTListed
+        - event: NFTSold(indexed address,indexed address,indexed uint256,uint256)
+          handler: handleNFTSold
+      file: Market\Market.wasm
+templates:
+  - kind: ethereum
+    name: LotteryEscrow
+    network: chapel
+    source:
+      abi: LotteryEscrow
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Lottery
+      abis:
+        - name: LotteryEscrow
+          file: LotteryEscrow\abis\LotteryEscrow.json
+      eventHandlers:
+        - event: LotteryEscrow__Deposited(string,indexed uint256,address,uint256)
+          handler: handleDeposited
+        - event: LotteryEscrow__ClaimedFund(string,indexed uint256,address,address,uint256)
+          handler: handleWinner
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: templates\LotteryEscrow\LotteryEscrow.wasm
+  - name: NFTMetadata
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: templates\NFTMetadata\NFTMetadata.wasm
+      handler: handleMetadata
+      entities:
+        - NFTMetadata
+      abis:
+        - name: NFT
+          file: NFTMetadata\abis\LotteryEscrow.json

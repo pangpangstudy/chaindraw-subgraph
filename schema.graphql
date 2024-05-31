@@ -1,0 +1,56 @@
+type Factory @entity {
+  id: ID!
+  lotteryCount: BigInt!
+  owner: ID!
+  registered: [Bytes!]!
+}
+type Lottery @entity {
+  id: ID!
+  name: String!
+  createAtTimestamp: BigInt!
+  createAtBlockNumber: BigInt!
+  concertId: String!
+  ticketType: BigInt!
+  price: BigInt!
+  url: String!
+  ddl: BigInt!
+  completeDraw: Boolean!
+  ticketCount: BigInt!
+  remainingTicketCount: BigInt!
+  winners: [Participant!]
+  organizer: Participant!
+  participants: [LotteryParticipant!]! @derivedFrom(field: "lottery")
+  nftMetadata: NFTMetadata
+}
+type Participant @entity {
+  id: ID!
+  nfts: [NFT!] @derivedFrom(field: "owner")
+  listings: [NFT!] @derivedFrom(field: "seller")
+  lotteries: [LotteryParticipant!] @derivedFrom(field: "participant")
+  createLotteries: [Lottery!] @derivedFrom(field: "organizer")
+  winningLotteries: [Lottery!] @derivedFrom(field: "winners")
+}
+type LotteryParticipant @entity {
+  id: ID!
+  participant: Participant!
+  lottery: Lottery!
+}
+type NFT @entity {
+  # lotteryAddress-tokenId
+  id: ID!
+  tokenId: BigInt!
+  tokenURI: String!
+  owner: Participant!
+  seller: Participant
+  lotteryAddress: Lottery!
+  price: BigInt!
+  nftMetadata: NFTMetadata
+}
+type NFTMetadata @entity(immutable: true) {
+  id: ID!
+  name: String!
+  description: String!
+  image: String!
+  concertName: String!
+  address: String!
+}
